@@ -1,0 +1,40 @@
+✅ All Rules of the N-Queen Problem
+Each queen must obey standard chess queen movement rules:
+
+1. One queen per row
+Each row must contain exactly one queen.
+
+You cannot place two queens in the same row.
+
+2. One queen per column
+Each column must contain exactly one queen.
+
+You cannot place two queens in the same column.
+
+3. No two queens on the same diagonal
+No two queens should share a left diagonal (↙↗) or a right diagonal (↘↖).
+
+4. No two queens should attack each other
+This rule is the result of combining the above three.
+
+That means no two queens can be in the same row, same column, or same diagonal.
+
+📐 Summary of Threat Zones
+For a queen placed at position (r, c):
+
+She attacks:
+
+    All cells in the same row r
+
+    All cells in the same column c
+
+    All cells on the main diagonal: cells where (row - column) is the same
+
+    All cells on the anti-diagonal: cells where (row + column) is the same
+
+✅ Valid Configuration Means:
+There are N queens placed.
+
+No two queens threaten each other.
+
+All rules above are followed.
