@@ -28,7 +28,7 @@ She attacks:
 
     All cells in the same column c
 
-    All cells on the main diagonal: cells where (row == column) is the same
+    All cells on the main diagonal: cells where (row - column) is the same
 
     All cells on the anti-diagonal: cells where (row + column) is the same
 
