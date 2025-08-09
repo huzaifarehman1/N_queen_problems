@@ -1,3 +1,4 @@
+import heapq
 import random
 
 class board:
@@ -38,7 +39,7 @@ class board:
     
     def calculator(self,num):
         temp = num - 1
-        return (1+temp)*(temp/2)
+        return int((1+temp)*(temp/2))
     
     def state_score(self):
         """The admirability of a state(lower the better)"""
@@ -73,6 +74,54 @@ class board:
             else:
                 AD_counter[AD_entry] += 1
         
-        for k,v in R_counter:
-            R_score = calculator(v)   
-            total_score +=      
+        for k,v in R_counter.items():
+            R_score = self.calculator(v)  
+            total_score +=  R_score
+        
+        for k,v in C_counter.items():
+            C_score = self.calculator(v)   
+            total_score +=  C_score 
+        
+        for k,v in MD_counter.items():
+            MD_score = self.calculator(v)  
+            total_score +=  MD_score
+        
+        for k,v in AD_counter.items():
+            AD_score = self.calculator(v)   
+            total_score +=  AD_score 
+        
+        return total_score
+
+class storage:
+    def __init__(self,size):
+        """
+            store best k nodes (lowest value)
+        Args:
+            size (int): k / size of the storage
+        """
+        self.size = size
+        self.count = 0
+        self.arr = []
+    
+    def is_full(self):
+        return self.count>=self.size
+    
+    def is_empty(self):
+        return self.count<=0  
+    
+    def push(self,container):
+        if self.is_full():
+            pass
+            
+    
+    def pop(self):
+        if self.is_empty():
+            raise Exception("EMPTY!!")
+        
+        
+
+def Solver(n):
+    pass    
+
+if __name__ == "__main__":
+    pass
