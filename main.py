@@ -92,6 +92,50 @@ class board:
         
         return total_score
 
+
+    def create_ALL_neighbours(self):
+        """
+        Create all neighbours of the current state as a list
+
+        Returns:
+            [board objects] (list): a list containing all neighbours as board object 
+        """
+        lis = []
+        
+        for r,c in self.positions:
+            possible = [
+                # Vertical (up, down)
+                (r-1, c),  # up
+                (r+1, c),  # down
+
+                # Horizontal (left, right)
+                (r, c-1),  # left
+                (r, c+1),  # right
+
+                # Diagonals
+                (r-1, c-1),  # up-left
+                (r-1, c+1),  # up-right
+                (r+1, c-1),  # down-left
+                (r+1, c+1)   # down-right
+            ]
+           
+        
+        
+        return lis
+
+    def __hash__(self):
+        return hash(tuple(self.positions))
+    
+    def print(self):
+        for i in board:
+            print(i)
+        return
+    
+    def __lt__(self,other):
+        return True
+    
+        
+    
 class storage:
     def __init__(self,size):
         """
@@ -102,26 +146,75 @@ class storage:
         self.size = size
         self.count = 0
         self.arr = []
-    
+
     def is_full(self):
         return self.count>=self.size
     
     def is_empty(self):
         return self.count<=0  
     
-    def push(self,container):
+    def push(self,Board:board,score):
         if self.is_full():
-            pass
+            pass    
+            
+        tup = (score,Board)
+        # we dont want any bad neighbours
+        heapq.heappush(self.arr,tup)
+        self.count += 1
             
     
     def pop(self):
         if self.is_empty():
             raise Exception("EMPTY!!")
+        tup = heapq.heappop(self.arr)
+        return tup
+        
         
         
 
 def Solver(n):
-    pass    
+        state_seen = 0
+        seen = set()
+        while True:
+           frontier = storage(n)
+           Board_ = board(n)
+           Board_.place_Queens([],True)
+           
+           
+           frontier.push(Board_,Board_.state_score())
+           if Board_ in seen:
+                continue
+           seen.add(Board_)
+           
+           if not(frontier.is_full()):
+                continue # add till frontier is full    
+           
+           while not(frontier.is_empty()):
+                state_seen += 1
+                ele: board
+                score: int
+                score,ele = frontier.pop()
+                # start hill climbing 
+                while True:
+                    best = score
+                    curr = ele
+                    if best <= 0: # found solution
+                        print(f"Found solution in {state_seen} states")
+                        curr.print()
+                        return True
+                    
+                    neighbours = ele.create_ALL_neighbours()
+                    i:board
+                    for i in neighbours:
+                        if i not in seen:
+                            seen.add(i)
+                            score = i.state_score()
+                            if score>best:
+                                best = score
+                                curr = i
+                            
+                
+            
 
 if __name__ == "__main__":
     pass

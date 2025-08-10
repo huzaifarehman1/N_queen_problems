@@ -2,13 +2,11 @@ The approch to solving it effeciently is to use "k best memory bounded random re
 To find the problem statement see rules.txt
 
 Approach — K-best memory-bounded random-restart hill-climbing search
-Goal. Efficiently solve the problem (see rules.txt) using a hill-climbing local search enhanced with:
+to Efficiently solve the problem (see rules.txt) using a hill-climbing local search enhanced with:
 
 a memory of the k best states seen so far, and
 
 random restarts seeded from this elite set (not purely random), while keeping memory bounded.
-
-This document explains the idea, data structures, algorithm, parameters, pseudo-code, and practical implementation tips so you can drop it into your project.
 
 1. High-level idea
 Run a standard hill-climb from an initial state until you reach a local optimum (or termination condition).
