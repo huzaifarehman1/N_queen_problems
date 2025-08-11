@@ -1,29 +1,27 @@
-The approch to solving it effeciently is to use "k best memory bounded random restart hill climbing search"
+The approch to solving it effeciently is to use "random restart hill climbing search"
 To find the problem statement see rules.txt
 
-Approach — K-best memory-bounded random-restart hill-climbing search
+Approach — random-restart hill-climbing search
 to Efficiently solve the problem (see rules.txt) using a hill-climbing local search enhanced with:
 
-a memory of the k best states seen so far, and
 
-random restarts seeded from this elite set (not purely random), while keeping memory bounded.
+random restarts seeded 
 
 1. High-level idea
 Run a standard hill-climb from an initial state until you reach a local optimum (or termination condition).
 
-Maintain an elite set (size ≤ k) that stores the best k states discovered so far (sorted by objective).
 
-When a run gets stuck, restart from a state sampled from the elite set (optionally perturb it slightly).
+When a run gets stuck, restart  a state 
 
-Continuously update the elite set with newly discovered good states.
+Continuously update the max_ for the best score 
 
 Terminate when budget (time, iterations, or evaluations) is used up or when solution quality meets the target.
 
 Advantages:
 
-restarts are focused on promising regions (exploitation), not blind random starts (exploration),
+restarts are focused 
 
-memory stays bounded (size k),
+memory stays bounded (size = 1),
 
-improves chance of finding global optimum while reusing good work.
+improves chance of finding global optimum 
 

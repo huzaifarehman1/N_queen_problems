@@ -23,17 +23,13 @@ class board:
                 self.positions.append((r,c))
         
         else:
-            choiceR = list(range(self.number))
-            
-            for i in range(self.number):
-                r = random.choice(choiceR)
-                choiceR.remove(r)
-                
-                c = i
-                
+            rows = list(range(self.number))
+            random.shuffle(rows)
+            for c in range(self.number):
+                r = rows[c]
                 self.board[r][c] = "Q"
                 self.positions.append((r, c))
-        
+                    
         return None    
     
     def calculator(self,num):
@@ -160,52 +156,7 @@ class board:
             return  set(self.positions) == set(other.positions)
         return False
     
-        
-    
-class storage:
-    def __init__(self,size):
-        """
-            store best k nodes (lowest value)
-        Args:
-            size (int): k / size of the storage
-        """
-        self.size = size
-        self.count = 0
-        self.arr = []
-        self.max = 0
 
-    def is_full(self):
-        return self.count>=self.size
-    
-    def is_empty(self):
-        return self.count<=0  
-    
-    def push(self,Board:board,score):
-        flag = False
-        if self.is_full(): 
-            if score>self.max:
-                return False
-            m = max(self.arr,key = lambda x : x[0])
-            self.arr.remove(m)
-            flag = True
-            
-        tup = (score,Board)
-        if score>self.max and not(flag):
-            self.max = score    
-        # we dont want any bad neighbours
-        heapq.heappush(self.arr,tup)
-        if not flag:
-            self.count += 1
-        if flag:
-            self.max = max(self.arr, key = lambda x: x)[0]
-            
-    
-    def pop(self):
-        if self.is_empty():
-            raise Exception("EMPTY!!")
-        self.count -= 1
-        tup = heapq.heappop(self.arr)
-        return tup
         
         
         
@@ -215,26 +166,26 @@ def Solver(n):
             print("No solution found")
             return 
         state_seen = 0
-        seen = set()
-        frontier = storage(n)
+        max_ = float("inf")
+        
         while True:
            
-           Board_ = board(n)
-           Board_.place_Queens([],True)
+                Board_ = board(n)
+                Board_.place_Queens([],True)
+                
+                score = Board_.state_score()
+                if score<max_:
+                    max_ = score
+                else:
+                    continue    
            
-           
-           if Board_ in seen:
-                continue
-           seen.add(Board_)
-           frontier.push(Board_,Board_.state_score())
-           if not(frontier.is_full()):
-                continue # add till frontier is full    
+              
             
-           while not(frontier.is_empty()):
+           
                 state_seen += 1
                 ele: board
                 score: int
-                score,ele = frontier.pop()
+                ele = Board_
                 
                 # start hill climbing 
                 flag = True
@@ -250,11 +201,9 @@ def Solver(n):
                     neighbours = ele.create_ALL_neighbours()
                     i:board
                     for i in neighbours:
-                        if i not in seen:
-                            seen.add(i)
+                            state_seen += 1
                             score = i.state_score()
                             if score<best:
-                                frontier.push(i,score)
                                 flag = True
                                 best = score
                                 curr = i
@@ -282,4 +231,4 @@ def take_input():
 
 if __name__ == "__main__":
     n = take_input()
-    Solver(n)      
+    Solver(n)
