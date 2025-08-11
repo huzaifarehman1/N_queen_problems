@@ -132,10 +132,12 @@ class board:
                 newPositions = []
                 for i in self.positions:
                     if (r,c)==(i[0],i[1]):
-                        temp.place_Queens([(Nr,Nc)])
+                        newPositions.append((Nr,Nc))
                     else:
-                        temp.place_Queens([i])
-                lis.append(temp)            
+                        newPositions.append(i)
+                temp.place_Queens(newPositions)        
+                lis.append(temp)
+                    
                     
         
         return lis
@@ -198,7 +200,7 @@ def Solver(n):
                         curr.print()
                         return state_seen
                     
-                    neighbours = ele.create_ALL_neighbours()
+                    neighbours = curr.create_ALL_neighbours()
                     i:board
                     for i in neighbours:
                             state_seen += 1
@@ -206,6 +208,7 @@ def Solver(n):
                             if score<best:
                                 flag = True
                                 best = score
+                                max_ = score
                                 curr = i
                             
                 
@@ -231,4 +234,9 @@ def take_input():
 
 if __name__ == "__main__":
     n = take_input()
-    Solver(n)
+    t = 0
+    for i in range(50):
+        s = Solver(n)
+        t += s
+        exit()
+    print(t/50)    
