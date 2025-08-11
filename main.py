@@ -23,18 +23,17 @@ class board:
                 self.positions.append((r,c))
         
         else:
-            choiceR = set()
-            choiceC = set()
+            choiceR = list(range(self.number))
+            
             for i in range(self.number):
-                choiceC.add(i)
-                choiceR.add(i)
-            for i in range(self.number):    
                 r = random.choice(choiceR)
                 choiceR.remove(r)
-                c = random.choice(choiceC)
-                choiceC.remove(c)
+                
+                c = i
+                
                 self.board[r][c] = "Q"
-                self.positions.append((r,c))
+                self.positions.append((r, c))
+        
         return None    
     
     def calculator(self,num):
@@ -118,8 +117,30 @@ class board:
                 (r+1, c-1),  # down-left
                 (r+1, c+1)   # down-right
             ]
-           
-        
+            for Nr,Nc in possible:
+                
+                if Nr<0:
+                    continue
+                if Nc<0:
+                    continue
+                
+                if Nr>=self.number:
+                    continue
+                if Nc >= self.number:
+                    continue
+                
+                if self.board[Nr][Nc]=="Q":
+                    continue
+                
+                temp = board(self.number)
+                newPositions = []
+                for i in self.positions:
+                    if (r,c)==(i[0],i[1]):
+                        temp.place_Queens([(Nr,Nc)])
+                    else:
+                        temp.place_Queens([i])
+                lis.append(temp)            
+                    
         
         return lis
 
@@ -127,12 +148,17 @@ class board:
         return hash(tuple(self.positions))
     
     def print(self):
-        for i in board:
+        for i in self.board:
             print(i)
         return
     
     def __lt__(self,other):
         return True
+    
+    def __eq__(self, other):
+        if isinstance(other, board):
+            return  set(self.positions) == set(other.positions)
+        return False
     
         
     
@@ -146,6 +172,7 @@ class storage:
         self.size = size
         self.count = 0
         self.arr = []
+        self.max = 0
 
     def is_full(self):
         return self.count>=self.size
@@ -154,18 +181,29 @@ class storage:
         return self.count<=0  
     
     def push(self,Board:board,score):
-        if self.is_full():
-            pass    
+        flag = False
+        if self.is_full(): 
+            if score>self.max:
+                return False
+            m = max(self.arr,key = lambda x : x[0])
+            self.arr.remove(m)
+            flag = True
             
         tup = (score,Board)
+        if score>self.max and not(flag):
+            self.max = score    
         # we dont want any bad neighbours
         heapq.heappush(self.arr,tup)
-        self.count += 1
+        if not flag:
+            self.count += 1
+        if flag:
+            self.max = max(self.arr, key = lambda x: x)[0]
             
     
     def pop(self):
         if self.is_empty():
             raise Exception("EMPTY!!")
+        self.count -= 1
         tup = heapq.heappop(self.arr)
         return tup
         
@@ -173,35 +211,41 @@ class storage:
         
 
 def Solver(n):
+        if n<=3:
+            print("No solution found")
+            return 
         state_seen = 0
         seen = set()
+        frontier = storage(n)
         while True:
-           frontier = storage(n)
+           
            Board_ = board(n)
            Board_.place_Queens([],True)
            
            
-           frontier.push(Board_,Board_.state_score())
            if Board_ in seen:
                 continue
            seen.add(Board_)
-           
+           frontier.push(Board_,Board_.state_score())
            if not(frontier.is_full()):
                 continue # add till frontier is full    
-           
+            
            while not(frontier.is_empty()):
                 state_seen += 1
                 ele: board
                 score: int
                 score,ele = frontier.pop()
+                
                 # start hill climbing 
-                while True:
-                    best = score
-                    curr = ele
+                flag = True
+                best = score
+                curr = ele
+                while flag:
+                    flag = False
                     if best <= 0: # found solution
                         print(f"Found solution in {state_seen} states")
                         curr.print()
-                        return True
+                        return state_seen
                     
                     neighbours = ele.create_ALL_neighbours()
                     i:board
@@ -209,12 +253,33 @@ def Solver(n):
                         if i not in seen:
                             seen.add(i)
                             score = i.state_score()
-                            if score>best:
+                            if score<best:
+                                frontier.push(i,score)
+                                flag = True
                                 best = score
                                 curr = i
                             
                 
             
 
+def take_input():
+    while True:
+        try:
+            x = int(input("Enter the number (n) of Queens: "))
+        except ValueError :
+            print("only integers allowed")
+            continue
+        except Exception as e:
+            print(e)
+            print("something went wrong")
+            continue
+            
+        else:    
+            if x<=0:
+                print("x must be >= 1")
+                continue
+            return x
+
 if __name__ == "__main__":
-    pass
+    n = take_input()
+    Solver(n)      
