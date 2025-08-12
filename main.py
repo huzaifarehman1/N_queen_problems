@@ -1,4 +1,3 @@
-import heapq
 import random
 
 class board:
@@ -6,29 +5,26 @@ class board:
     def __init__(self,n):
         self.num_queens = n
         self.number = n #rows = column = number of queens
-        self.board = [ ["" for i in range(n)] for j in range(n) ]
-        self.positions = []
+        
+        self.positions = [-1]*n # no queen at any column and row | self.positions[i] = j means i column and j row
     
-    def place_Queens(self,indexies:list,Randomized = False):
+    def place_Queens(self,indexies:set,Randomized = False):
         """place Queen on the specified tile
         Randomized: if True, the placement is random
-        indexies: list of tuples (row, column) where the queens should be placed   
+        indexies: list[int] — list where index = column, value = row  
         if Randomized is False, the queens are placed on the specified indexies
         if Randomized is True, the queens are placed randomly on the board
         """
         if not(Randomized):
-            for i in indexies:
-                r,c = i
-                self.board[r][c] = "Q"
-                self.positions.append((r,c))
+            for c,r in enumerate(indexies):
+                self.positions[c] = r
         
         else:
             rows = list(range(self.number))
             random.shuffle(rows)
             for c in range(self.number):
                 r = rows[c]
-                self.board[r][c] = "Q"
-                self.positions.append((r, c))
+                self.positions[c] = r
                     
         return None    
     
@@ -41,21 +37,9 @@ class board:
         # 0 for the solution
         # work by counting check of all pieces to all pieces 
         total_score = 0
-        R_counter = {}
-        C_counter = {}
         MD_counter = {}
         AD_counter = {}
-        for i in range(self.number):
-            r,c = self.positions[i]
-            if r not in R_counter:
-                R_counter[r] = 1
-            else:
-                R_counter[r] += 1 
-                
-            if c not in C_counter:
-                C_counter[c] = 1
-            else:
-                C_counter[c] += 1       
+        for c,r in enumerate(self.positions):   
                 
             Main_diagonal_entry = r - c
             if Main_diagonal_entry not in MD_counter:
@@ -69,13 +53,6 @@ class board:
             else:
                 AD_counter[AD_entry] += 1
         
-        for k,v in R_counter.items():
-            R_score = self.calculator(v)  
-            total_score +=  R_score
-        
-        for k,v in C_counter.items():
-            C_score = self.calculator(v)   
-            total_score +=  C_score 
         
         for k,v in MD_counter.items():
             MD_score = self.calculator(v)  
@@ -97,44 +74,14 @@ class board:
         """
         lis = []
         
-        for r,c in self.positions:
-            possible = [
-                # Vertical (up, down)
-                (r-1, c),  # up
-                (r+1, c),  # down
-
-                # Horizontal (left, right)
-                (r, c-1),  # left
-                (r, c+1),  # right
-
-                # Diagonals
-                (r-1, c-1),  # up-left
-                (r-1, c+1),  # up-right
-                (r+1, c-1),  # down-left
-                (r+1, c+1)   # down-right
-            ]
-            for Nr,Nc in possible:
-                
-                if Nr<0:
-                    continue
-                if Nc<0:
-                    continue
-                
-                if Nr>=self.number:
-                    continue
-                if Nc >= self.number:
-                    continue
-                
-                if self.board[Nr][Nc]=="Q":
-                    continue
+        for c,r in enumerate(self.positions):
+            for j in range(c + 1,self.number):
+                Nc = j
+                Nr = self.positions[j]
                 
                 temp = board(self.number)
-                newPositions = []
-                for i in self.positions:
-                    if (r,c)==(i[0],i[1]):
-                        newPositions.append((Nr,Nc))
-                    else:
-                        newPositions.append(i)
+                newPositions = self.positions[::]
+                newPositions[c],newPositions[Nc] = newPositions[Nc],newPositions[c]
                 temp.place_Queens(newPositions)        
                 lis.append(temp)
                     
@@ -146,8 +93,18 @@ class board:
         return hash(tuple(self.positions))
     
     def print(self):
+        self.board = [ ["" for i in range(self.number)] for j in range(self.number) ]
+        for c,r in enumerate(self.positions):
+             if r!=-1:
+                 self.board[r][c] = "Q"
         for i in self.board:
             print(i)
+        with open("answer.txt","w") as f:
+            f.write(str(self.board[0])+ "\n")
+            
+        with open("answer.txt","a") as f:    
+            for i in range(1,self.number):
+                f.write(str(self.board[i]) + "\n")    
         return
     
     def __lt__(self,other):
@@ -164,6 +121,7 @@ class board:
         
 
 def Solver(n):
+        res = 0
         if n<=3:
             print("No solution found")
             return 
@@ -171,6 +129,7 @@ def Solver(n):
         max_ = float("inf")
         
         while True:
+                res += 1
            
                 Board_ = board(n)
                 Board_.place_Queens([],True)
@@ -178,6 +137,7 @@ def Solver(n):
                 score = Board_.state_score()
                 if score<max_:
                     max_ = score
+                    print(f"Best start till now have {max_} score")
                 else:
                     continue    
            
@@ -196,8 +156,8 @@ def Solver(n):
                 while flag:
                     flag = False
                     if best <= 0: # found solution
-                        print(f"Found solution in {state_seen} states")
                         curr.print()
+                        print(f"Found solution in {state_seen} states and {res} restarts (first included)" )
                         return state_seen
                     
                     neighbours = curr.create_ALL_neighbours()
@@ -208,7 +168,6 @@ def Solver(n):
                             if score<best:
                                 flag = True
                                 best = score
-                                max_ = score
                                 curr = i
                             
                 
@@ -234,9 +193,4 @@ def take_input():
 
 if __name__ == "__main__":
     n = take_input()
-    t = 0
-    for i in range(50):
-        s = Solver(n)
-        t += s
-        exit()
-    print(t/50)    
+    Solver(n)   
